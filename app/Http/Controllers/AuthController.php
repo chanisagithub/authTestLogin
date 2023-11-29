@@ -18,44 +18,58 @@ class AuthController extends Controller
             'email' => $request->input('email'),
             'password' => Hash::make($request->input('password')),
         ]);
+
     }
 
     public function login(Request $request)
     {
         if (!Auth::attempt($request->only('email', 'password'))) {
             return response([
-                'message' => 'fail',
+                'message' => 'Invalid credentials',
 
             ], Response::HTTP_UNAUTHORIZED);
         } else {
             
-
-            return $user = Auth::user();
+            $user = User::where('email', $request->input('email'))->firstOrFail();
         
-            // $token = $user->createToken('token')->plainTextToken;
+            $token = $user->createToken('auth_token')->plainTextToken;
 
-            // $cookie = cookie('jwt', $token, 60 * 24); //one day
+            // $cookie = cookie('jwt', $token, 60 * 24);
 
-            // return response([
-            //     'token' => $token,
-            // ])->withCookie($cookie);
+            return response()->json([
+                'user' => $user,
+                'auth_token' => $token,
+                'token_type' => 'Bearer',
+            ]);
         }
     }
 
 
-    public function user()
+    public function getUser()
+    {
+        
+        return Auth::user();
+    }
+
+    public function authUser()
     {
         return Auth::user();
     }
 
     public function logout()
     {
-        $cookie = Cookie::forget('jwt');
-
-        return response(['message' => 'logout success'])->withCookie($cookie);
+        auth()->user()->tokens()->delete();
+        return response()->json([
+            'message' => 'Logged out',
+        ],Response::HTTP_OK );
     }
 
     public function test()
+    {
+        return 'test';
+    }
+
+    public function authTest()
     {
         return 'test';
     }

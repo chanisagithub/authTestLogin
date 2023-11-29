@@ -19,14 +19,16 @@ use App\Http\Controllers\RegisterController;
 
 
 Route::post('login', [AuthController::class, 'login']);
-
-Route::post('logout', [AuthController::class, 'logout']);
+Route::post('register', [AuthController::class, 'register']);
+Route::get('user', [AuthController::class, 'getUser']);
+Route::post('test', [AuthController::class, 'test']);
 
 Route::middleware('auth:sanctum')->group(function () {
 
-    Route::get('user', [AuthController::class, 'user']);
-    Route::post('register', [AuthController::class, 'register']);
-    Route::post('test', [AuthController::class, 'test']);
+    Route::post('authTest', [AuthController::class, 'authTest']);
+    Route::post('authTest', [AuthController::class, 'authTest']);
+    
+    Route::post('logout', [AuthController::class, 'logout']);
 
 });
 
