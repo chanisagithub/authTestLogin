@@ -22,32 +22,44 @@ class AuthController extends Controller
     }
 
     public function login(Request $request)
+    // {
+    //     $credentials = $request->validate([
+    //         'email' => ['email'],
+    //         'password' => ['required'],
+    //     ]);
+ 
+    //     if (Auth::attempt($credentials)) {
+    //         $request->session()->regenerate();
+ 
+    //         return redirect()->intended('dashboard');
+    //     }
+ 
+    //     return back()->withErrors([
+    //         'email' => 'The provided credentials do not match our records.',
+    //     ])->onlyInput('email');
+    // }
     {
         if (!Auth::attempt($request->only('email', 'password'))) {
             return response([
-                'message' => 'Invalid credentials',
+                'message' => 'Username or Password is incorrect',
 
             ], Response::HTTP_UNAUTHORIZED);
         } else {
             
             $user = User::where('email', $request->input('email'))->firstOrFail();
         
-            $token = $user->createToken('auth_token')->plainTextToken;
+            $token = $user->createToken('authToken')->plainTextToken;
 
             // $cookie = cookie('jwt', $token, 60 * 24);
+            $cookie = Cookie::make('auth_token', $token, 60*24);
 
-            return response()->json([
-                'user' => $user,
-                'auth_token' => $token,
-                'token_type' => 'Bearer',
-            ]);
+            return response()->json(['user' => $user, 'token' => $token])->withCookie($cookie);
         }
     }
 
 
     public function getUser()
     {
-        
         return Auth::user();
     }
 
